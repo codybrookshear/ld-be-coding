@@ -1,0 +1,24 @@
+{
+  "name": "ld-be-coding",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/codybrookshear/ld-be-coding.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/codybrookshear/ld-be-coding/issues"
+  },
+  "homepage": "https://github.com/codybrookshear/ld-be-coding#readme",
+  "dependencies": {
+    "eventsource": "^1.1.0",
+    "express": "^4.17.1"
+  }
+}
