@@ -1,5 +1,9 @@
 ## TODO / questions
 
+- describe inputs and outputs for all functions
+
+- switch to LokiJS?
+
 - handle requests to any other endpoints (404?)
 
 - events for any other event type are ignored.
@@ -15,6 +19,10 @@
 - how to run own local event source (set EVENT_SOURCE environment variable for client to use)
 
 - ONLY store records that are well formed; have every field, etc
+
+- what if new records are coming in at the same time we are returning results (or building an average?)
+
+- assumption: if you get the same studentId + exam pair, overwrite the score; don't add a new record to the DB; i.e. a given student can only have one score for a given exam. we assume that the newer score is correct.
 
 ## Building
 
