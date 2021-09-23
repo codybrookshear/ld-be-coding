@@ -12,11 +12,11 @@ const eventSource = new EventSource(
 class ScoreMap {
   constructor() {
     // exams => students => scores
-    // exams is a map of exam numbers to maps of student scores
+    // exams maps exam numbers to maps of (studentIds to scores)
     this.exams = new Map();
 
     // students => exams => scores
-    // students is a map of student ids to maps of exam numbers scores
+    // students maps student ids to maps of (exam numbers to scores)
     this.students = new Map();
   }
 
@@ -63,16 +63,20 @@ class ScoreMap {
   getStudent(studentId) {
     let scores = [];
     let exams = this.students.get(studentId);
+    let sum = 0;
+    let average = 0;
 
     if (exams !== undefined) {
       for (let exam of exams.keys()) {
-        scores.push({ exam: exam, score: exams.get(exam) });
-        // TODO calc average
+        let score = exams.get(exam);
+        scores.push({ exam: exam, score: score });
+        sum += score;
       }
     }
 
-    // TODO return average
-    return { studentId: studentId, scores: scores };
+    if (sum !== 0) average = sum / exams.size;
+
+    return { studentId: studentId, average: average, scores: scores };
   }
 
   getExams() {
@@ -88,16 +92,20 @@ class ScoreMap {
   getExam(exam) {
     let scores = [];
     let students = this.exams.get(exam);
+    let sum = 0;
+    let average = 0;
 
     if (students !== undefined) {
       for (let student of students.keys()) {
+        let score = students.get(student);
         scores.push({ studentId: student, score: students.get(student) });
-        // TODO calc average
+        sum += score;
       }
     }
 
-    // TODO return average
-    return { exam: exam, scores: scores };
+    if (sum !== 0) average = sum / students.size;
+
+    return { exam: exam, average: average, scores: scores };
   }
 }
 

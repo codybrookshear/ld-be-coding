@@ -24,6 +24,8 @@
 
 - assumption: if you get the same studentId + exam pair, overwrite the score; don't add a new record to the DB; i.e. a given student can only have one score for a given exam. we assume that the newer score is correct.
 
+- is the default floating point precision good enough? no data loss ever?
+
 ## Building
 
 - You will need `node` and `npm` installed.
