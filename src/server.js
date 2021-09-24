@@ -11,9 +11,19 @@ const studentData = new NestedMap(
   "studentId",
   "scores",
   "exam",
-  "score"
+  "score",
+  false,
+  true
 );
-const examData = new NestedMap("exams", "exam", "scores", "studentId", "score");
+const examData = new NestedMap(
+  "exams",
+  "exam",
+  "scores",
+  "studentId",
+  "score",
+  true,
+  false
+);
 
 exports.getStudentData = function () {
   return studentData;

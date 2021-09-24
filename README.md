@@ -38,7 +38,11 @@
 
 ## Running
 
-- Run `node index.js` in the root of the project
+- Run `node src/server.js` in the root of the project
+
+## Testing
+
+- Run `npm run test` in the root of the project
 
 ## REST API definition
 

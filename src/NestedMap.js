@@ -4,7 +4,9 @@ class NestedMap {
     outerKey = "outerKey",
     arr = "arr",
     key = "key",
-    value = "value"
+    value = "value",
+    castOuterKeyAsNumber = false,
+    castInnerKeyAsNumber = true
   ) {
     // outerMap maps to innerMaps of key, value pairs
     this.outerMap = new Map();
@@ -14,6 +16,8 @@ class NestedMap {
     this.arr = arr;
     this.key = key;
     this.value = value;
+    this.castInnerKeyAsNumber = castInnerKeyAsNumber;
+    this.castOuterKeyAsNumber = castOuterKeyAsNumber;
   }
 
   set(outerKey, innerKey, value) {
@@ -36,12 +40,21 @@ class NestedMap {
     this.outerMap.set(outerKey, innerMap);
   }
 
+  clear() {
+    this.outerMap.clear();
+  }
+
   getOuterKeys() {
     let res = [];
 
     for (let outerKey of this.outerMap.keys()) {
       let obj = {};
-      obj[this.outerKey] = outerKey;
+      if (this.castOuterKeyAsNumber) {
+        obj[this.outerKey] = Number(outerKey);
+      } else {
+        obj[this.outerKey] = outerKey;
+      }
+
       res.push(obj);
     }
 
@@ -60,7 +73,12 @@ class NestedMap {
     if (innerMap !== undefined) {
       for (let innerKey of innerMap.keys()) {
         let obj = {};
-        obj[this.key] = innerKey;
+
+        if (this.castInnerKeyAsNumber === true) {
+          obj[this.key] = Number(innerKey);
+        } else {
+          obj[this.key] = innerKey;
+        }
 
         let value = innerMap.get(innerKey);
         obj[this.value] = value;
@@ -73,7 +91,13 @@ class NestedMap {
     if (sum !== 0) average = sum / innerMap.size;
 
     let obj = {};
-    obj[this.outerKey] = outerKey;
+
+    if (this.castOuterKeyAsNumber) {
+      obj[this.outerKey] = Number(outerKey);
+    } else {
+      obj[this.outerKey] = outerKey;
+    }
+
     obj.average = average;
     obj[this.arr] = values;
 
