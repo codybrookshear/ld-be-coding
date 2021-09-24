@@ -9,131 +9,130 @@ const eventSource = new EventSource(
 
 // TODO put in separate file
 
-class ScoreMap {
+class NestedMap {
   constructor() {
-    // exams => students => scores
-    // exams maps exam numbers to maps of (studentIds to scores)
-    this.exams = new Map();
-
-    // students => exams => scores
-    // students maps student ids to maps of (exam numbers to scores)
-    this.students = new Map();
+    // outerMap maps to innerMaps of key, value pairs
+    this.outerMap = new Map();
   }
 
-  set(record) {
-    let obj = JSON.parse(record);
-
-    // TODO - how to best check? what to do if bad?
-    if (obj === null) return;
+  set(outerKey, innerKey, value) {
+    // TODO verify value is a number
 
     // rewrite exam as a string so we can use it as a map key
-    obj.exam = String(obj.exam);
-
-    // TODO - write a generic function that can be called here?
-    // TODO - and just pass in the base map in question?
-    // TODO - would this be better for testability?
+    outerKey = String(outerKey);
+    innerKey = String(innerKey);
 
     // update this student's map of exams to scores
-    let student = this.students.get(obj.studentId);
-    if (student === undefined) {
-      student = new Map();
+    let innerMap = this.outerMap.get(outerKey);
+    if (innerMap === undefined) {
+      innerMap = new Map();
     }
-    student.set(obj.exam, obj.score);
-    this.students.set(obj.studentId, student);
-
-    // update the exam records for this student
-    let exam = this.exams.get(obj.exam);
-    if (exam === undefined) {
-      exam = new Map();
-    }
-    exam.set(obj.studentId, obj.score);
-    this.exams.set(obj.exam, exam);
+    innerMap.set(innerKey, value);
+    this.outerMap.set(outerKey, innerMap);
   }
 
-  getStudents() {
+  getOuterKeys(objName) {
     let res = [];
 
-    for (let student of this.students.keys()) {
-      res.push({ studentId: student });
+    for (let outerKey of this.outerMap.keys()) {
+      let obj = {};
+      obj[objName] = outerKey;
+      res.push(obj);
     }
 
-    return { students: res };
+    return res;
   }
 
-  getStudent(studentId) {
-    let scores = [];
-    let exams = this.students.get(studentId);
+  // req.params.number,
+  //  "students",
+  //  "studentId",
+  //  "score"
+
+  getInnerValues(
+    outerKeyLabel,
+    outerKey,
+    strArrayLabel,
+    strKeyLabel,
+    strValueLabel
+  ) {
+    let values = [];
+    let innerMap = this.outerMap.get(outerKey);
     let sum = 0;
     let average = 0;
 
-    if (exams !== undefined) {
-      for (let exam of exams.keys()) {
-        let score = exams.get(exam);
-        scores.push({ exam: exam, score: score });
-        sum += score;
+    if (innerMap !== undefined) {
+      for (let innerKey of innerMap.keys()) {
+        let obj = {};
+        obj[strKeyLabel] = innerKey;
+
+        let value = innerMap.get(innerKey);
+        obj[strValueLabel] = value;
+
+        values.push(obj);
+        sum += value;
       }
     }
 
-    if (sum !== 0) average = sum / exams.size;
+    if (sum !== 0) average = sum / innerMap.size;
 
-    return { studentId: studentId, average: average, scores: scores };
-  }
+    let obj = {};
+    obj[outerKeyLabel] = outerKey;
+    obj.average = average;
+    obj[strArrayLabel] = values;
 
-  getExams() {
-    let res = [];
-
-    for (let exam of this.exams.keys()) {
-      res.push({ exam: exam });
-    }
-
-    return { exams: res };
-  }
-
-  getExam(exam) {
-    let scores = [];
-    let students = this.exams.get(exam);
-    let sum = 0;
-    let average = 0;
-
-    if (students !== undefined) {
-      for (let student of students.keys()) {
-        let score = students.get(student);
-        scores.push({ studentId: student, score: students.get(student) });
-        sum += score;
-      }
-    }
-
-    if (sum !== 0) average = sum / students.size;
-
-    return { exam: exam, average: average, scores: scores };
+    return obj;
   }
 }
 
 var app = express();
-var scores = new ScoreMap();
+var studentData = new NestedMap();
+var examData = new NestedMap();
 
 // receive data from the event source and store it
 // add to json array
 eventSource.addEventListener("score", function (e) {
-  scores.set(e.data);
+  let data = JSON.parse(e.data);
+  let { studentId, exam, score } = data;
+
+  studentData.set(studentId, exam, score);
+  examData.set(exam, studentId, score);
 });
 
 // Define REST API routes we serve
 
 app.get("/students", function (req, res) {
-  res.send(scores.getStudents());
+  let students = studentData.getOuterKeys("studentId");
+  res.send({ students: students });
 });
 
 app.get("/students/:id", function (req, res) {
-  res.send(scores.getStudent(req.params.id));
+  let scores = studentData.getInnerValues(
+    "studentId",
+    req.params.id,
+    "scores",
+    "exam",
+    "score"
+  );
+  res.send(scores);
+  // TODO put in json, and get average here
 });
 
 app.get("/exams", function (req, res) {
-  res.send(scores.getExams());
+  let exams = examData.getOuterKeys("exam");
+  res.send({ exams: exams });
 });
 
 app.get("/exams/:number", function (req, res) {
-  res.send(scores.getExam(req.params.number));
+  let scores = examData.getInnerValues(
+    "exam",
+    req.params.number,
+    "scores",
+    "studentId",
+    "score"
+  );
+
+  res.send(scores);
+  // TODO put in json, and get average here
 });
 
 app.listen(PORT, function () {
