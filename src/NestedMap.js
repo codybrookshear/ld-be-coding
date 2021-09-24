@@ -1,22 +1,33 @@
 class NestedMap {
-  constructor(outerKeyLabel, strArrayLabel, strKeyLabel, strValueLabel) {
+  constructor(
+    wrapper = "wrapper",
+    outerKey = "outerKey",
+    arr = "arr",
+    key = "key",
+    value = "value"
+  ) {
     // outerMap maps to innerMaps of key, value pairs
     this.outerMap = new Map();
 
-    this.outerKeyLabel = outerKeyLabel;
-    this.strArrayLabel = strArrayLabel;
-    this.strKeyLabel = strKeyLabel;
-    this.strValueLabel = strValueLabel;
+    this.wrapper = wrapper;
+    this.outerKey = outerKey;
+    this.arr = arr;
+    this.key = key;
+    this.value = value;
   }
 
   set(outerKey, innerKey, value) {
-    // TODO verify value is a number
+    if (isNaN(value)) {
+      return; // ignore values that aren't numeric
+    }
 
-    // rewrite exam as a string so we can use it as a map key
+    // map keys must be strings, so cast them as such.
+    // as we may numeric data coming in.
     outerKey = String(outerKey);
     innerKey = String(innerKey);
+    value = Number(value);
 
-    // update this student's map of exams to scores
+    // update the value for the inner map
     let innerMap = this.outerMap.get(outerKey);
     if (innerMap === undefined) {
       innerMap = new Map();
@@ -25,16 +36,19 @@ class NestedMap {
     this.outerMap.set(outerKey, innerMap);
   }
 
-  getOuterKeys(objName) {
+  getOuterKeys() {
     let res = [];
 
     for (let outerKey of this.outerMap.keys()) {
       let obj = {};
-      obj[objName] = outerKey;
+      obj[this.outerKey] = outerKey;
       res.push(obj);
     }
 
-    return res;
+    let retObj = {};
+    retObj[this.wrapper] = res;
+
+    return retObj;
   }
 
   getInnerValues(outerKey) {
@@ -46,10 +60,10 @@ class NestedMap {
     if (innerMap !== undefined) {
       for (let innerKey of innerMap.keys()) {
         let obj = {};
-        obj[this.strKeyLabel] = innerKey;
+        obj[this.key] = innerKey;
 
         let value = innerMap.get(innerKey);
-        obj[this.strValueLabel] = value;
+        obj[this.value] = value;
 
         values.push(obj);
         sum += value;
@@ -59,9 +73,9 @@ class NestedMap {
     if (sum !== 0) average = sum / innerMap.size;
 
     let obj = {};
-    obj[this.outerKeyLabel] = outerKey;
+    obj[this.outerKey] = outerKey;
     obj.average = average;
-    obj[this.strArrayLabel] = values;
+    obj[this.arr] = values;
 
     return obj;
   }

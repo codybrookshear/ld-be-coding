@@ -1,0 +1,4 @@
+{
+    "port": 3000,
+    "eventSource": "https://live-test-scores.herokuapp.com/scores"
+}

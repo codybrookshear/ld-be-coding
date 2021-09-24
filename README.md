@@ -1,5 +1,7 @@
 ## TODO / questions
 
+- sanitize inputs?
+
 - specific commnet format that can generate docs?
 
 - describe inputs and outputs for all functions

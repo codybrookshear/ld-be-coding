@@ -2,9 +2,9 @@
   "name": "ld-be-coding",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "src/server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "export NODE_ENV=test && mocha --exit"
   },
   "repository": {
     "type": "git",
@@ -18,7 +18,12 @@
   },
   "homepage": "https://github.com/codybrookshear/ld-be-coding#readme",
   "dependencies": {
+    "config": "^3.3.6",
     "eventsource": "^1.1.0",
     "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "chai": "^4.3.4",
+    "mocha": "^9.1.1"
   }
 }
