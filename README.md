@@ -1,5 +1,7 @@
 ## TODO / questions
 
+- specific commnet format that can generate docs?
+
 - describe inputs and outputs for all functions
 
 - switch to LokiJS?

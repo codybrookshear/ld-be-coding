@@ -10,9 +10,14 @@ const eventSource = new EventSource(
 // TODO put in separate file
 
 class NestedMap {
-  constructor() {
+  constructor(outerKeyLabel, strArrayLabel, strKeyLabel, strValueLabel) {
     // outerMap maps to innerMaps of key, value pairs
     this.outerMap = new Map();
+
+    this.outerKeyLabel = outerKeyLabel;
+    this.strArrayLabel = strArrayLabel;
+    this.strKeyLabel = strKeyLabel;
+    this.strValueLabel = strValueLabel;
   }
 
   set(outerKey, innerKey, value) {
@@ -43,18 +48,7 @@ class NestedMap {
     return res;
   }
 
-  // req.params.number,
-  //  "students",
-  //  "studentId",
-  //  "score"
-
-  getInnerValues(
-    outerKeyLabel,
-    outerKey,
-    strArrayLabel,
-    strKeyLabel,
-    strValueLabel
-  ) {
+  getInnerValues(outerKey) {
     let values = [];
     let innerMap = this.outerMap.get(outerKey);
     let sum = 0;
@@ -63,10 +57,10 @@ class NestedMap {
     if (innerMap !== undefined) {
       for (let innerKey of innerMap.keys()) {
         let obj = {};
-        obj[strKeyLabel] = innerKey;
+        obj[this.strKeyLabel] = innerKey;
 
         let value = innerMap.get(innerKey);
-        obj[strValueLabel] = value;
+        obj[this.strValueLabel] = value;
 
         values.push(obj);
         sum += value;
@@ -76,17 +70,17 @@ class NestedMap {
     if (sum !== 0) average = sum / innerMap.size;
 
     let obj = {};
-    obj[outerKeyLabel] = outerKey;
+    obj[this.outerKeyLabel] = outerKey;
     obj.average = average;
-    obj[strArrayLabel] = values;
+    obj[this.strArrayLabel] = values;
 
     return obj;
   }
 }
 
 var app = express();
-var studentData = new NestedMap();
-var examData = new NestedMap();
+var studentData = new NestedMap("studentId", "scores", "exam", "score");
+var examData = new NestedMap("exam", "scores", "studentId", "score");
 
 // receive data from the event source and store it
 // add to json array
@@ -106,15 +100,8 @@ app.get("/students", function (req, res) {
 });
 
 app.get("/students/:id", function (req, res) {
-  let scores = studentData.getInnerValues(
-    "studentId",
-    req.params.id,
-    "scores",
-    "exam",
-    "score"
-  );
+  let scores = studentData.getInnerValues(req.params.id);
   res.send(scores);
-  // TODO put in json, and get average here
 });
 
 app.get("/exams", function (req, res) {
@@ -123,16 +110,8 @@ app.get("/exams", function (req, res) {
 });
 
 app.get("/exams/:number", function (req, res) {
-  let scores = examData.getInnerValues(
-    "exam",
-    req.params.number,
-    "scores",
-    "studentId",
-    "score"
-  );
-
+  let scores = examData.getInnerValues(req.params.number);
   res.send(scores);
-  // TODO put in json, and get average here
 });
 
 app.listen(PORT, function () {
