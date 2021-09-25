@@ -53,13 +53,7 @@ exports.getExamData = function () {
   return examData;
 };
 
-// Periodically, we receive a JSON payload that represents a student's test
-// score (a JavaScript number between 0 and 1), the exam number, and a
-// student ID that uniquely identifies a student.
-// example data received:
-//   event: score
-//   data: {"exam": 3, "studentId": "foo", score: .991}
-
+// listen for the "score" event and update our data store
 eventSource.addEventListener("score", function (e) {
   let data = JSON.parse(e.data);
   let { studentId, exam, score } = data;
