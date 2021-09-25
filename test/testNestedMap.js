@@ -6,19 +6,18 @@ const expect = chai.expect;
 const app = require("../src/server");
 
 describe("verify NestedMap class", () => {
-  let nestedMap = new NestedMap();
-
   it("is properly set up", () => {
+    let nestedMap = new NestedMap();
     let outerKeys = nestedMap.getOuterKeys();
     expect(outerKeys.wrapper.length).to.equal(0);
 
     let innerValues = nestedMap.getInnerValues();
     expect(innerValues.average).to.equal(0);
-    //expect(innerValues.outerKey).to.equal(undefined).or;
     expect(innerValues.arr.length).to.equal(0);
   });
 
   it("holds 1 value correctly", () => {
+    let nestedMap = new NestedMap();
     nestedMap.set("o", 123, 1);
 
     let outerKeys = nestedMap.getOuterKeys();
@@ -34,25 +33,30 @@ describe("verify NestedMap class", () => {
   });
 
   it("holds 2 values correctly, at same outer key", () => {
-    nestedMap.set("o", 124, 2);
+    let nestedMap = new NestedMap();
+    nestedMap.set("o", 123, 1);
+    nestedMap.set("o", 124, 0.5);
 
     let outerKeys = nestedMap.getOuterKeys();
     expect(outerKeys.wrapper.length).to.equal(1);
     expect(outerKeys.wrapper[0].outerKey).to.equal("o");
 
     let innerValues = nestedMap.getInnerValues("o");
-    expect(innerValues.average).to.equal(1.5); // (1 + 2) / 2
+    expect(innerValues.average).to.equal(0.75);
     expect(innerValues.outerKey).to.equal("o");
 
     expect(innerValues.arr.length).to.equal(2);
     expect(innerValues.arr[0].key).to.equal(123);
     expect(innerValues.arr[0].value).to.equal(1);
     expect(innerValues.arr[1].key).to.equal(124);
-    expect(innerValues.arr[1].value).to.equal(2);
+    expect(innerValues.arr[1].value).to.equal(0.5);
   });
 
   it("and another value at a different outer key", () => {
-    nestedMap.set("o2", 125, 3);
+    let nestedMap = new NestedMap();
+    nestedMap.set("o", 123, 1);
+    nestedMap.set("o", 124, 0.5);
+    nestedMap.set("o2", 125, 0.8);
 
     let outerKeys = nestedMap.getOuterKeys();
     expect(outerKeys.wrapper.length).to.equal(2);
@@ -61,24 +65,23 @@ describe("verify NestedMap class", () => {
 
     // expect same as last test for o
     let innerValues = nestedMap.getInnerValues("o");
-    expect(innerValues.average).to.equal(1.5); // (1 + 2) / 2
+    expect(innerValues.average).to.equal(0.75);
     expect(innerValues.outerKey).to.equal("o");
     expect(innerValues.arr.length).to.equal(2);
     expect(innerValues.arr[0].key).to.equal(123);
     expect(innerValues.arr[0].value).to.equal(1);
     expect(innerValues.arr[1].key).to.equal(124);
-    expect(innerValues.arr[1].value).to.equal(2);
+    expect(innerValues.arr[1].value).to.equal(0.5);
 
     // now verify o2
     innerValues = nestedMap.getInnerValues("o2");
-    expect(innerValues.average).to.equal(3);
+    expect(innerValues.average).to.equal(0.8);
     expect(innerValues.outerKey).to.equal("o2");
     expect(innerValues.arr.length).to.equal(1);
     expect(innerValues.arr[0].key).to.equal(125);
-    expect(innerValues.arr[0].value).to.equal(3);
+    expect(innerValues.arr[0].value).to.equal(0.8);
   });
 
-  // TODO test map with custom labels
   it("uses constructor custom labels correctly", () => {
     nestedMap = new NestedMap("a", "b", "c", "d", "e");
     nestedMap.set("o", 123, 1);
@@ -98,6 +101,21 @@ describe("verify NestedMap class", () => {
   it("ignores non-numeric values", () => {
     nestedMap = new NestedMap();
     nestedMap.set("o", "i", "A");
+    let outerKeys = nestedMap.getOuterKeys();
+    expect(outerKeys.wrapper.length).to.equal(0);
+  });
+
+  it("accepts numeric string score", () => {
+    nestedMap = new NestedMap();
+    nestedMap.set("o", "i", "0.5");
+    let outerKeys = nestedMap.getOuterKeys();
+    expect(outerKeys.wrapper.length).to.equal(1);
+  });
+
+  it("ignores out-of-range values", () => {
+    nestedMap = new NestedMap();
+    nestedMap.set("o", "i", -0.1);
+    nestedMap.set("o", "i", 1.111112);
     let outerKeys = nestedMap.getOuterKeys();
     expect(outerKeys.wrapper.length).to.equal(0);
   });

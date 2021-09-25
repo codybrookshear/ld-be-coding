@@ -1,4 +1,21 @@
+/**
+ * A class to store student exam data. It tires to be generic and useful
+ * outside of that specific use case, but doesn't quite acheive.
+ */
+
 class NestedMap {
+  /**
+   * Constructor is a bit unweildy. We need all these strings so we can
+   * provide the exact names the client wants for each object, so they
+   * don't have to later copy to another object with the desired names.
+   * @param {string} wrapper label for wrapper object returned by functions
+   * @param {string} outerKey label for outerKey variable returned by functions
+   * @param {string} arr label for arr variable returned by functions
+   * @param {string} key label for key variable returned by functions
+   * @param {string} value label for value variable returned by functions
+   * @param {boolean} castOuterKeyAsNumber 'true' if functions should cast outer key as a number
+   * @param {boolean} castInnerKeyAsNumber 'true' if functions should cast inner key as a number
+   */
   constructor(
     wrapper = "wrapper",
     outerKey = "outerKey",
@@ -8,7 +25,7 @@ class NestedMap {
     castOuterKeyAsNumber = false,
     castInnerKeyAsNumber = true
   ) {
-    // outerMap maps to innerMaps of key, value pairs
+    /** outerMap maps to innerMaps of key, value pairs */
     this.outerMap = new Map();
 
     this.wrapper = wrapper;
@@ -20,16 +37,28 @@ class NestedMap {
     this.castOuterKeyAsNumber = castOuterKeyAsNumber;
   }
 
+  /**
+   * Inserts a new set of values into the map
+   * @param {*} outerKey outer key to set
+   * @param {*} innerKey inner key to set
+   * @param {number} value value to set
+   */
   set(outerKey, innerKey, value) {
+    // ignore values that aren't numeric
     if (isNaN(value)) {
-      return; // ignore values that aren't numeric
+      return;
+    }
+
+    // ensure value is between 0 and 1
+    value = Number(value);
+    if (value < 0 || value > 1) {
+      return;
     }
 
     // map keys must be strings, so cast them as such.
     // as we may numeric data coming in.
     outerKey = String(outerKey);
     innerKey = String(innerKey);
-    value = Number(value);
 
     // update the value for the inner map
     let innerMap = this.outerMap.get(outerKey);
@@ -40,10 +69,18 @@ class NestedMap {
     this.outerMap.set(outerKey, innerMap);
   }
 
+  /**
+   * Clears the conents of our outerMap (and thus the innerMap(s) contents)
+   */
   clear() {
     this.outerMap.clear();
   }
 
+  /**
+   * Gets a list of the outerKeys in an opionanted way
+   * (i.e. matching the caller's desired REST API)
+   * @returns {Object} example:
+   */
   getOuterKeys() {
     let res = [];
 
@@ -63,7 +100,11 @@ class NestedMap {
 
     return retObj;
   }
-
+  /**
+   * @param {string} outerKey the key to match in the outer map
+   * @returns {Object} an object containing an array of inner key, value pairs
+   * along with an average of values
+   */
   getInnerValues(outerKey) {
     let values = [];
     let innerMap = this.outerMap.get(outerKey);
@@ -105,4 +146,7 @@ class NestedMap {
   }
 }
 
+/**
+ * Export this class for use in other files
+ */
 module.exports = NestedMap;

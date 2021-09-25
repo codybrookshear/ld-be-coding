@@ -1,11 +1,21 @@
+/**
+ * This application receives sever-sent-events and redistributes the data
+ * over a REST API
+ */
+
 const config = require("config");
 const EventSource = require("eventsource");
 const express = require("express");
 const NestedMap = require("./NestedMap");
 
+// the URL for the server-sent-events server is stored in
+// in config/default.json (or config/test.json in the case of unit tests)
 const eventSource = new EventSource(config.eventSource);
+
+// serve our application using express http server
 const app = express();
 
+/** stores the data received in a student-centric way */
 const studentData = new NestedMap(
   "students",
   "studentId",
@@ -15,6 +25,8 @@ const studentData = new NestedMap(
   false,
   true
 );
+
+/** stores the data received in a exam-centric way */
 const examData = new NestedMap(
   "exams",
   "exam",
@@ -25,16 +37,29 @@ const examData = new NestedMap(
   false
 );
 
+/**
+ * Get access to the studentData map. The only user should be the unit test framework!
+ * @returns the studentData map
+ */
 exports.getStudentData = function () {
   return studentData;
 };
 
+/**
+ * Get access to the examData map. The only user should be the unit test framework!
+ * @returns the examData map
+ */
 exports.getExamData = function () {
   return examData;
 };
 
-// receive data from the event source and store it
-// add to json array
+// Periodically, we receive a JSON payload that represents a student's test
+// score (a JavaScript number between 0 and 1), the exam number, and a
+// student ID that uniquely identifies a student.
+// example data received:
+//   event: score
+//   data: {"exam": 3, "studentId": "foo", score: .991}
+
 eventSource.addEventListener("score", function (e) {
   let data = JSON.parse(e.data);
   let { studentId, exam, score } = data;
@@ -43,7 +68,7 @@ eventSource.addEventListener("score", function (e) {
   examData.set(exam, studentId, score);
 });
 
-// Define REST API routes we serve
+// Define REST API routes we serve, see README.md for detailed definitions
 
 app.get("/students", function (req, res) {
   let students = studentData.getOuterKeys();
@@ -65,6 +90,8 @@ app.get("/exams/:number", function (req, res) {
   res.send(scores);
 });
 
+// listen for HTTP connections on the specified port, as defined
+// in config/default.json (or config/test.json in the case of unit tests)
 app.listen(config.port, function () {
   console.log("App listening on port " + config.port);
 });
