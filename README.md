@@ -13,7 +13,7 @@ Server-based app designed to the specifications defined in [PROBLEM.md](PROBLEM.
 
 ## Manual Testing
 
-- By default, app is served on port 3000, but you can change this in **config/default.json** (or **conifg/test.json** in the case of running unit tests)
+- By default, the server runs on port 3000, but you can change this in **config/default.json** (or **conifg/test.json** in the case of running unit tests)
 
 - Access the endpoints using either your web browser (Chrome/Firefox/etc) or use `curl`:
 
@@ -21,12 +21,12 @@ Server-based app designed to the specifications defined in [PROBLEM.md](PROBLEM.
    $ curl http://localhost:3000/students
    $ curl http://localhost:3000/students/Nicola92
    $ curl http://localhost:3000/exams
-   curl http://localhost:3000/exams/3713
+   $ curl http://localhost:3000/exams/3713
    ```
 
 ## Unit tests
 
-- Run `npm run test` in the root of the project to run **_mocha/chai_** unit tests
+- Run `npm run test` in the root of the project to run **mocha** unit tests.
 
 ## REST API definitions
 
