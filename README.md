@@ -1,10 +1,11 @@
 # LD test scores app
 
+Server-based app designed to the specifications defined in [PROBLEM.md](PROBLEM.md).
+
 ## Building
 
-- You will need `node` and `npm` installed.
-- I am using `node` version **v10.19.0** and `npm` version **6.14.4**.
 - Run `npm install`
+- You will need **node** and **npm** [installed](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm). Tested using **node** version **v10.19.0** and **npm** version **6.14.4**.
 
 ## Running
 
@@ -16,15 +17,16 @@
 
 - Access the endpoints using either your web browser (Chrome/Firefox/etc) or use `curl`:
 
-```bash
-$ curl http://localhost:3000/students
-```
+   ```bash
+   $ curl http://localhost:3000/students
+   $ curl http://localhost:3000/students/Nicola92
+   $ curl http://localhost:3000/exams
+   curl http://localhost:3000/exams/3713
+   ```
 
 ## Unit tests
 
 - Run `npm run test` in the root of the project to run **_mocha/chai_** unit tests
-
-## Server-sent-events definition
 
 ## REST API definitions
 
