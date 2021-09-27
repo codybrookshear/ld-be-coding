@@ -6,7 +6,6 @@
 const config = require("config");
 const EventSource = require("eventsource");
 const express = require("express");
-const NestedMap = require("./NestedMap");
 const sqlite3 = require("sqlite3").verbose();
 
 // initialize database with needed tables
