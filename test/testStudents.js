@@ -7,10 +7,8 @@ const config = require("config");
 chai.use(chaiHttp);
 
 describe("/GET students/ endpoint", () => {
-  let studentData = server.getStudentData();
-
   beforeEach((done) => {
-    studentData.clear();
+    server.clearScores();
     done();
   });
 
@@ -25,9 +23,9 @@ describe("/GET students/ endpoint", () => {
   });
 
   it("/GET students/ with 3 records", (done) => {
-    studentData.set("Tom", 1334, 0.77);
-    studentData.set("Rick", 1334, 0.81);
-    studentData.set("Tom", 1335, 0.83);
+    server.insertScore("Tom", 1334, 0.77);
+    server.insertScore("Rick", 1334, 0.81);
+    server.insertScore("Tom", 1335, 0.83);
 
     chai
       .request("http://localhost:" + config.port)
@@ -41,15 +39,14 @@ describe("/GET students/ endpoint", () => {
   });
 
   it("/GET students/Tom - verify exams and average", (done) => {
-    studentData.set("Tom", 1334, 0.77);
-    studentData.set("Rick", 1334, 0.81);
-    studentData.set("Tom", 1335, 0.83);
+    server.insertScore("Tom", 1334, 0.77);
+    server.insertScore("Rick", 1334, 0.81);
+    server.insertScore("Tom", 1335, 0.83);
 
     chai
       .request("http://localhost:" + config.port)
       .get("/students/Tom")
       .end((err, res) => {
-        //console.log(JSON.stringify(res.body));
         expect(res.body.studentId).to.equal("Tom");
         expect(res.body.average).to.equal(0.8);
         expect(res.body.scores.length).to.equal(2);
@@ -75,7 +72,7 @@ describe("/GET students/ endpoint", () => {
   });
 
   it("/GET students/Tom when no matching records", (done) => {
-    studentData.set("Rick", 1334, 0.81);
+    server.insertScore("Rick", 1334, 0.81);
 
     chai
       .request("http://localhost:" + config.port)

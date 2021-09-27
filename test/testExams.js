@@ -7,10 +7,9 @@ const config = require("config");
 chai.use(chaiHttp);
 
 describe("/GET exams/ endpoint", () => {
-  let data = server.getExamData();
 
   beforeEach((done) => {
-    data.clear();
+    server.clearScores();
     done();
   });
 
@@ -25,14 +24,15 @@ describe("/GET exams/ endpoint", () => {
   });
 
   it("/GET exams/ with 3 records", (done) => {
-    data.set(1334, "Tom", 0.77);
-    data.set(1334, "Rick", 0.81);
-    data.set(1335, "Tom", 0.83);
+    server.insertScore("Tom", 1334, 0.77);
+    server.insertScore("Rick", 1334, 0.81);
+    server.insertScore("Tom", 1335, 0.83);
 
     chai
       .request("http://localhost:" + config.port)
       .get("/exams")
       .end((err, res) => {
+        console.log("exams.length: " + res.body.exams.length);
         expect(res.body.exams.length).to.equal(2);
         expect(res.body.exams[0].exam).to.equal(1334);
         expect(res.body.exams[1].exam).to.equal(1335);
@@ -41,15 +41,14 @@ describe("/GET exams/ endpoint", () => {
   });
 
   it("/GET exams/1334 - verify studentIds and average", (done) => {
-    data.set(1334, "Tom", 0.77);
-    data.set(1334, "Rick", 0.81);
-    data.set(1335, "Tom", 0.83);
+    server.insertScore("Tom", 1334, 0.77);
+    server.insertScore("Rick", 1334, 0.81);
+    server.insertScore("Tom", 1335, 0.83);
 
     chai
       .request("http://localhost:" + config.port)
       .get("/exams/1334")
       .end((err, res) => {
-        //console.log(JSON.stringify(res.body));
         expect(res.body.exam).to.equal(1334);
         expect(res.body.average).to.equal(0.79);
         expect(res.body.scores.length).to.equal(2);
@@ -75,7 +74,7 @@ describe("/GET exams/ endpoint", () => {
   });
 
   it("/GET exams/1334 when no matching records", (done) => {
-    data.set(1335, "Tom", 0.83);
+    server.insertScore("Tom", 1335, 0.83);
 
     chai
       .request("http://localhost:" + config.port)
